@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "uuid": "^9.0.1",
+    "ws": "^8.14.2"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "twe-server",
+  "version": "1.0.0",
+  "description": "twe vr",
+  "main": "server.js",
+  "devDependencies": {},
+  "author": "Yakel",
+  "license": "ISC"
+}
