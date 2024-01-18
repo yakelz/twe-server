@@ -32,6 +32,10 @@ function handleMessage(ws, data, sessionManager) {
 			sessionManager.leaveSession(ws);
 			break;
 
+		case 'set_loaded':
+			sessionManager.onClientLoad(ws);
+			break;
+
 		case 'message':
 			const messageData = message.message;
 			sessionManager.sendMessage(ws, messageData);

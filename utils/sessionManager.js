@@ -2,6 +2,7 @@ const Session = require('../data/session');
 const Client = require('../data/client');
 const WebSocket = require('ws');
 const { broadcastMessage } = require('./broadcastMessage');
+const { createCleanSession } = require('./createCleanSession');
 const { v4: uuidv4 } = require('uuid');
 
 class SessionManager {
@@ -27,7 +28,7 @@ class SessionManager {
 		this.clients.set(ws, client);
 		console.log('session_created: ' + sessionId);
 
-		ws.send(JSON.stringify({ type: 'session_created', session: newSession }));
+		ws.send(JSON.stringify({ type: 'session_created', session: createCleanSession(newSession) }));
 	}
 
 	joinSession(ws, nickname, sessionId) {
@@ -52,8 +53,12 @@ class SessionManager {
 
 		console.log(nickname + ' joined to ' + sessionId);
 
-		ws.send(JSON.stringify({ type: 'session_joined', session: session }));
-		broadcastMessage(sessionId, JSON.stringify({ type: 'player_joined', session: session }), ws);
+		ws.send(JSON.stringify({ type: 'session_joined', session: createCleanSession(session) }));
+		broadcastMessage(
+			session,
+			JSON.stringify({ type: 'player_joined', session: createCleanSession(session) }),
+			ws
+		);
 	}
 
 	startGame(ws) {
@@ -90,7 +95,10 @@ class SessionManager {
 	onSessionChange(sessionId, ws) {
 		const session = this.sessions.get(sessionId);
 		if (session) {
-			const sessionData = JSON.stringify({ type: 'session_update', session: session });
+			const sessionData = JSON.stringify({
+				type: 'session_update',
+				session: createCleanSession(session),
+			});
 
 			console.log(session);
 			if (session.host && session.host.ws.readyState === WebSocket.OPEN) {
@@ -107,6 +115,18 @@ class SessionManager {
 		if (client) {
 			client.isReady = !client.isReady;
 			this.onSessionChange(client.sessionId, ws);
+		}
+	}
+
+	onClientLoad(ws) {
+		const client = this.clients.get(ws);
+		if (client) {
+			client.isLoaded = true;
+			const session = this.sessions.get(client.sessionId);
+			broadcastMessage(session, JSON.stringify({ type: 'player_loaded' }), ws);
+			if (session.host.isLoaded && session.secondPlayer.isLoaded) {
+				this.onSessionChange(session.id, ws);
+			}
 		}
 	}
 

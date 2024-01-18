@@ -4,6 +4,7 @@ class Client {
 		this.nickname = nickname;
 		this.isReady = false;
 		this.sessionId = null;
+		this.isLoaded = false;
 	}
 }
 
