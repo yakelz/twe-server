@@ -61,6 +61,10 @@ class WebSocketClient {
 	sendMessageToSession(message) {
 		this.sendMessage('message', { message });
 	}
+
+	isClientInGame() {
+		this.sendMessage('client_in_game');
+	}
 }
 
 module.exports = {

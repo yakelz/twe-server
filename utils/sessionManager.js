@@ -169,6 +169,19 @@ class SessionManager {
 		this.clients.delete(ws);
 	}
 
+	isClientInGame(ws) {
+		let state = false;
+		for (const session of this.sessions.values()) {
+			if (
+				(session.host && session.host.ws === ws) ||
+				(session.secondPlayer && session.secondPlayer.ws === ws)
+			) {
+				state = true;
+			}
+		}
+		ws.send(JSON.stringify({ type: 'is_client_in_game', state: state }));
+	}
+
 	sendMessage(ws, messageIn) {
 		const client = this.clients.get(ws);
 		if (!client || !client.sessionId) return;

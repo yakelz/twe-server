@@ -36,6 +36,10 @@ function handleMessage(ws, data, sessionManager) {
 			sessionManager.onClientLoad(ws);
 			break;
 
+		case 'client_in_game':
+			sessionManager.isClientInGame(ws);
+			break;
+
 		case 'message':
 			const messageData = message.message;
 			sessionManager.sendMessage(ws, messageData);
